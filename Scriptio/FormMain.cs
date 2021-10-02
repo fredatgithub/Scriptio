@@ -775,19 +775,20 @@ namespace Scriptio
 
     private void SaveWindowValue()
     {
-      //Settings.Default.WindowHeight = Height;
-      //Settings.Default.WindowWidth = Width;
-      //Settings.Default.WindowLeft = Left;
-      //Settings.Default.WindowTop = Top;
-      //Settings.Default.Save();
+
+      Properties.Settings.Default.WindowHeight = Height;
+      Properties.Settings.Default.WindowWidth = Width;
+      Properties.Settings.Default.WindowLeft = Left;
+      Properties.Settings.Default.WindowTop = Top;
+      Properties.Settings.Default.Save();
     }
 
     private void GetWindowValue()
     {
-      //Width = Settings.Default.WindowWidth;
-      //Height = Settings.Default.WindowHeight;
-      //Top = Settings.Default.WindowTop < 0 ? 0 : Settings.Default.WindowTop;
-      //Left = Settings.Default.WindowLeft < 0 ? 0 : Settings.Default.WindowLeft;
+      Width = Properties.Settings.Default.WindowWidth;
+      Height = Properties.Settings.Default.WindowHeight;
+      Top = Properties.Settings.Default.WindowTop < 0 ? 0 : Properties.Settings.Default.WindowTop;
+      Left = Properties.Settings.Default.WindowLeft < 0 ? 0 : Properties.Settings.Default.WindowLeft;
     }
 
     private void Scriptio_FormClosing(object sender, FormClosingEventArgs e)
