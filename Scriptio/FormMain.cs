@@ -48,7 +48,9 @@ using System;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
@@ -113,17 +115,17 @@ namespace Scriptio
       {
         SqlConnection connection = GetConnection("tempdb");
         //Server srv = new Server(new ServerConnection(connection));
-        Server srv = new Server(serverName);
+        Server server = new Server(serverName);
 
         // Check if we're using 2005 or higher
-        if (srv.Information.Version.Major >= 9)
+        if (server.Information.Version.Major >= 9)
         {
           // RS: Set the progress bar maximum so we can update it as we step through
-          toolStripProgressBar1.Maximum = srv.Databases.Count;
+          toolStripProgressBar1.Maximum = server.Databases.Count;
 
           ddlDatabases.Items.Add("(Select a database)");
 
-          foreach (Database db in srv.Databases)
+          foreach (Database db in server.Databases)
           {
             // RS: Update the progress bar
             toolStripProgressBar1.Value++;
@@ -156,6 +158,7 @@ namespace Scriptio
 
       // RS: Reset the label text
       toolStripStatusLabel1.Text = "Ready";
+      toolStripProgressBar1.Value = toolStripProgressBar1.Minimum;
     }
 
     private void PopulateObjects(string serverName, string databaseName)
@@ -213,7 +216,7 @@ namespace Scriptio
         allobjects.Rows.Add(new object[] { false, dataRow[1].ToString(), dataRow[2].ToString(), dataRow[0].ToString(), dataRow[3].ToString() });
         // RS: This is a little chunky, I'm open to suggestions in terms of making it more efficient. All
         // it does is populate the clbSchema listbox with unique schema values that aren't system schemas.
-        if ((!clbSchema.Items.Contains(dataRow[1].ToString())) && (dataRow[1].ToString() != "" && dataRow[1].ToString() != "sys" && dataRow[1].ToString() != "INFORMATION_SCHEMA"))
+        if ((!clbSchema.Items.Contains(dataRow[1].ToString())) && (dataRow[1].ToString() != string.Empty && dataRow[1].ToString() != "sys" && dataRow[1].ToString() != "INFORMATION_SCHEMA"))
         {
           clbSchema.Items.Add(dataRow[1].ToString());
         }
@@ -360,7 +363,7 @@ namespace Scriptio
       }
     }
 
-    private void btnScript_Click(object sender, EventArgs e)
+    private void BtnScript_Click(object sender, EventArgs e)
     {
       // RS: This section has also been heavily modified and rewritten to use the Scripter object instead of
       // iterating through predefined objects and using their .Script method. This gives us the added
@@ -379,10 +382,10 @@ namespace Scriptio
         srv = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
       }
 
-      string objectType = "";
-      string objectName = "";
-      string schema = "";
-      txtResult.Text = "";
+      string objectType = string.Empty;
+      string objectName = string.Empty;
+      string schema = string.Empty;
+      txtResult.Text = string.Empty;
 
       result = new StringBuilder();
 
@@ -465,7 +468,7 @@ namespace Scriptio
         objectType = row[3].ToString();
         objectName = row[2].ToString();
         schema = row[1].ToString();
-        string fileName = "";
+        string fileName = string.Empty;
 
         if (rdoOnePerObject.Checked)
         {
@@ -607,11 +610,8 @@ namespace Scriptio
       txtResult.Text = result.ToString();
       toolStripStatusLabel1.Text = "Ready";
       tabControl1.SelectedTab = tabResult;
-      // RS: Null our scripting objects (not necessary, but I like it)
-      scriptit = null;
-      scripturn = null;
-      allobjectschecked.RowFilter = "";
-      Application.DoEvents();
+      allobjectschecked.RowFilter = string.Empty;
+      toolStripProgressBar1.Value = toolStripProgressBar1.Minimum;
     }
 
     private void AddLines(StringCollection strings)
@@ -662,13 +662,13 @@ namespace Scriptio
 
     private void RdoNoFiles_CheckedChanged(object sender, EventArgs e)
     {
-      txtSaveLocation.Text = "";
+      txtSaveLocation.Text = string.Empty;
       chkNamingConventions.Enabled = false;
     }
 
     private void RdoOnePerObject_CheckedChanged(object sender, EventArgs e)
     {
-      txtSaveLocation.Text = "";
+      txtSaveLocation.Text = string.Empty;
       chkNamingConventions.Enabled = true;
     }
 
@@ -722,7 +722,7 @@ namespace Scriptio
       }
     }
 
-    private void Scriptio_Load(object sender, EventArgs e)
+    private void ScriptioLoad(object sender, EventArgs e)
     {
       // RS: If we're building a debug build, set the server name to localhost and populate the database
       // list - saves us the hassle if we're testing. Change this as necessary.
@@ -730,6 +730,15 @@ namespace Scriptio
       txtServerName.Text = @"localhost";
       PopulateDatabases(txtServerName.Text);
 #endif
+      GetWindowValue();
+      DisplayTitle();
+    }
+
+    private void DisplayTitle()
+    {
+      Assembly assembly = Assembly.GetExecutingAssembly();
+      FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+      Text += string.Format(" V{0}.{1}.{2}.{3}", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
     }
 
     private void ClbType_SelectedIndexChanged(object sender, EventArgs e)
@@ -762,6 +771,28 @@ namespace Scriptio
           dataRow[0] = false;
         }
       }
+    }
+
+    private void SaveWindowValue()
+    {
+      //Settings.Default.WindowHeight = Height;
+      //Settings.Default.WindowWidth = Width;
+      //Settings.Default.WindowLeft = Left;
+      //Settings.Default.WindowTop = Top;
+      //Settings.Default.Save();
+    }
+
+    private void GetWindowValue()
+    {
+      //Width = Settings.Default.WindowWidth;
+      //Height = Settings.Default.WindowHeight;
+      //Top = Settings.Default.WindowTop < 0 ? 0 : Settings.Default.WindowTop;
+      //Left = Settings.Default.WindowLeft < 0 ? 0 : Settings.Default.WindowLeft;
+    }
+
+    private void Scriptio_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      SaveWindowValue();
     }
   }
 }

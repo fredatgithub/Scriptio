@@ -112,16 +112,26 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="textBox1.Text" xml:space="preserve">
     <value>Scriptio comes with ABSOLUTELY NO WARRANTY; This is free software and you are welcome to redistribute it under certain conditions.  Please see the GNU GPL license in the source code or at http://www.gnu.org.</value>
   </data>
   <data name="richTextBox1.Text" xml:space="preserve">
-    <value>Version 0.6.1 (May 28, 2008)
+    <value>Version 1.0 (October 2021)                                                                                                             
+
+* Migrate repository from Codeplex to GitHub
+https://github.com/fredatgithub/Scriptio
+* Migrate solution from V8 to V16 (Visual Studio 2019)
+* Migrate to Framework .NET 4.8
+* Refactor code and clean code
+* Add WinFormApplicationWindowSizeValues NuGet package
+https://www.nuget.org/packages/WinFormApplicationWindowSizeValues/
+* Add WinFormApplicationVersionTitleBar NuGet package
+https://www.nuget.org/packages/WinFormApplicationVersionTitleBar/
 -------------------------------------------------------------------------------------
 * Bug fix: correct encoding options when scripting to multiple files
 * Bug fix: changed row filter so selected system objects aren't scripted
@@ -155,7 +165,7 @@ Version 0.5.3 (Feb 12th, 2006)
 * Script assemblies
 * Script object permissions</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

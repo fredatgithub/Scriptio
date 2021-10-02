@@ -18,75 +18,70 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using System.Reflection;
-
 using System.Deployment.Application;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace Scriptio
 {
-    public partial class AboutForm : Form
+  public partial class AboutForm : Form
+  {
+    public AboutForm()
     {
-        public AboutForm()
-        {
-            InitializeComponent();
+      InitializeComponent();
 
-            lblAssemblyVersion.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString().Trim();
+      lblAssemblyVersion.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString().Trim();
 
-            lblClickOnceVersion.Text = (ApplicationDeployment.IsNetworkDeployed ?
-                    " " + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString().Trim() :
-                     "" ).Trim();
+      lblClickOnceVersion.Text = (ApplicationDeployment.IsNetworkDeployed ? " " + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString().Trim() : string.Empty).Trim();
 
-            if (ApplicationDeployment.IsNetworkDeployed)
-                btnUpdates.Enabled = true;
-            else
-                btnUpdates.Enabled = false;
-        }
-
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btnUpdates_Click(object sender, EventArgs e)
-        {
-            if (ApplicationDeployment.IsNetworkDeployed)
-            {
-                Cursor cur = Cursor.Current;
-                Cursor.Current = Cursors.WaitCursor;
-                try
-                {
-                    if (ApplicationDeployment.CurrentDeployment.CheckForUpdate())
-                    {
-                        Cursor.Current = cur;
-                        if (MessageBox.Show(
-                            "An updated version is available. Would you like to update now?",
-                            "Update Found", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                        {
-                            Cursor.Current = Cursors.WaitCursor;
-                            ApplicationDeployment.CurrentDeployment.Update();
-                            Cursor.Current = cur;
-                            MessageBox.Show("Update downloaded. Scriptio will now restart.");
-                            Application.Restart();
-                        }
-                    }
-                    else
-                    {
-                        Cursor.Current = cur;
-                        MessageBox.Show("No updates available at this time.");
-                    }
-                }
-                finally
-                {
-                    Cursor.Current = cur;
-                }
-            }
-        }
-
+      if (ApplicationDeployment.IsNetworkDeployed)
+      {
+        btnUpdates.Enabled = true;
+      }
+      else
+      {
+        btnUpdates.Enabled = false;
+      }
     }
+
+    private void BtnClose_Click(object sender, EventArgs e)
+    {
+      Close();
+    }
+
+    private void BtnUpdates_Click(object sender, EventArgs e)
+    {
+      if (ApplicationDeployment.IsNetworkDeployed)
+      {
+        Cursor currentCursor = Cursor.Current;
+        Cursor.Current = Cursors.WaitCursor;
+        try
+        {
+          if (ApplicationDeployment.CurrentDeployment.CheckForUpdate())
+          {
+            Cursor.Current = currentCursor;
+            if (MessageBox.Show(
+                "An updated version is available. Would you like to update now?",
+                "Update Found", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+              Cursor.Current = Cursors.WaitCursor;
+              ApplicationDeployment.CurrentDeployment.Update();
+              Cursor.Current = currentCursor;
+              MessageBox.Show("Update downloaded. Scriptio will now restart.");
+              Application.Restart();
+            }
+          }
+          else
+          {
+            Cursor.Current = currentCursor;
+            MessageBox.Show("No updates available at this time.");
+          }
+        }
+        finally
+        {
+          Cursor.Current = currentCursor;
+        }
+      }
+    }
+  }
 }
