@@ -366,7 +366,7 @@ namespace Scriptio
     private void BtnScript_Click(object sender, EventArgs e)
     {
       // RS: This section has also been heavily modified and rewritten to use the Scripter object instead of
-      // iterating through predefined objects and using their .Script method. This gives us the added
+      // iterating through predefined objects and using their script method. This gives us the added
       // flexibility of being able to populate the allobjects DataTable with ANY object that has a valid
       // URN, and the code will script it.
       toolStripStatusLabel1.Text = "Preparing script...";
