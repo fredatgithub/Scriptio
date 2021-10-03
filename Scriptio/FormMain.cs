@@ -612,6 +612,7 @@ namespace Scriptio
       tabControl1.SelectedTab = tabResult;
       allobjectschecked.RowFilter = string.Empty;
       toolStripProgressBar1.Value = toolStripProgressBar1.Minimum;
+      txtResult.DeselectAll();
     }
 
     private void AddLines(StringCollection strings)

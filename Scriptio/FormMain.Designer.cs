@@ -118,6 +118,7 @@ namespace Scriptio
       // 
       // tabObjects
       // 
+      this.tabObjects.BackColor = System.Drawing.Color.Chocolate;
       this.tabObjects.Controls.Add(this.groupBox3);
       this.tabObjects.Controls.Add(this.dgAvailableObjects);
       this.tabObjects.Controls.Add(this.groupBox2);
@@ -129,10 +130,10 @@ namespace Scriptio
       this.tabObjects.Size = new System.Drawing.Size(772, 596);
       this.tabObjects.TabIndex = 0;
       this.tabObjects.Text = "Database Objects";
-      this.tabObjects.UseVisualStyleBackColor = true;
       // 
       // groupBox3
       // 
+      this.groupBox3.BackColor = System.Drawing.Color.IndianRed;
       this.groupBox3.Controls.Add(this.clbType);
       this.groupBox3.Controls.Add(this.clbSchema);
       this.groupBox3.Controls.Add(this.label3);
@@ -452,6 +453,7 @@ namespace Scriptio
       // 
       // groupBox5
       // 
+      this.groupBox5.BackColor = System.Drawing.Color.IndianRed;
       this.groupBox5.Controls.Add(this.chkGenerateASCII);
       this.groupBox5.Controls.Add(this.chkSchemaQualifyFK);
       this.groupBox5.Controls.Add(this.chkSchemaQualifyDrops);
@@ -526,6 +528,7 @@ namespace Scriptio
       // 
       // groupBox4
       // 
+      this.groupBox4.BackColor = System.Drawing.Color.Firebrick;
       this.groupBox4.Controls.Add(this.chkNamingConventions);
       this.groupBox4.Controls.Add(this.rdoOnePerObject);
       this.groupBox4.Controls.Add(this.btnPickDirectory);
@@ -646,7 +649,8 @@ namespace Scriptio
       // 
       // txtResult
       // 
-      this.txtResult.BackColor = System.Drawing.SystemColors.ScrollBar;
+      this.txtResult.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+      this.txtResult.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.txtResult.Location = new System.Drawing.Point(3, 3);
       this.txtResult.Multiline = true;
       this.txtResult.Name = "txtResult";
@@ -657,7 +661,7 @@ namespace Scriptio
       // 
       // btnCancel
       // 
-      this.btnCancel.Location = new System.Drawing.Point(703, 655);
+      this.btnCancel.Location = new System.Drawing.Point(703, 650);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 1;
@@ -667,7 +671,7 @@ namespace Scriptio
       // 
       // btnScript
       // 
-      this.btnScript.Location = new System.Drawing.Point(622, 655);
+      this.btnScript.Location = new System.Drawing.Point(622, 650);
       this.btnScript.Name = "btnScript";
       this.btnScript.Size = new System.Drawing.Size(75, 23);
       this.btnScript.TabIndex = 2;
