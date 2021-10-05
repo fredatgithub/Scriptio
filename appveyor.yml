@@ -11,7 +11,7 @@
 # build platform, i.e. x86, x64, Any CPU. This setting is optional.
 #platform: Any CPU
 image:
-  Visual studio 2017
+  Visual studio 2019
 # to add several platforms to build matrix:
 platform:
 #  - x86
