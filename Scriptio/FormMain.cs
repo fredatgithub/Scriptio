@@ -1,7 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //  Scriptio - Script SQL Server 2005 objects
 //  Copyright (C) 2005 Bill Graziano and 2008 Riccardo Spagni
-
+//  Copyright (C) MIT 2021 Freddy Juhel
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -21,13 +22,6 @@
 
 // TODO: (ie. optional extras:)
 //
-// - NB: Check if this works with SQL 2008 (Katmai)
-//
-// - NB: Find a way of integrating with SQL 2005's context menu; maybe have Scriptio as a contex menu item on a
-//   database level, and then launch Scriptio with the authentication items already filled in, the database list
-//   populated with a single item (the database we've right clicked, obviously) and grayed out, and fire off the
-//   PopulateDatabases method. Also, see if we can't integrate it with SQL 2008 as well whilst we're about it.
-//
 // - Build intelligence into the selection system, so that when you select an item in the DataGrid it checks if
 //   all Stored Procs, for example, have been manually ticked in the DataGrid, and then reflects that in the
 //   CheckedListBox by ticking the StoredProc's item.
@@ -35,8 +29,6 @@
 // - "Beautify" the items in clbType, so that it puts a space between capitalised words - ie. when it adds
 //   UserDefinedTypes to the clbType items collection, it should add it as "User Defined Types". Beautify the
 //   description in the DataGrid too so that they match.
-//
-// - Add other encoding options (UTF-7, UTF-8, UTF-32, BigEndianUnicode), dependant on demand
 //
 // - Make sure we've exposed ALL relevant ScriptingOptions properties to the user, you never know what oddity might
 //   be required by a single person in a single environment
@@ -114,7 +106,6 @@ namespace Scriptio
       try
       {
         SqlConnection connection = GetConnection("tempdb");
-        //Server srv = new Server(new ServerConnection(connection));
         Server server = new Server(serverName);
 
         // Check if we're using 2005 or higher
@@ -142,8 +133,7 @@ namespace Scriptio
         }
         else
         {
-          MessageBox.Show("SMO Scripting is only available for SQL Server 2005 and higher",
-              "Incorrect Server Version", MessageBoxButtons.OK, MessageBoxIcon.Error);
+          MessageBox.Show("SMO Scripting is only available for SQL Server 2005 and higher", "Incorrect Server Version", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
           dgAvailableObjects.Rows.Clear();
           chkScriptAll.Checked = false;
@@ -152,8 +142,7 @@ namespace Scriptio
       }
       catch (ConnectionFailureException)
       {
-        MessageBox.Show("Unable to connect to server",
-                "Invalid Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show("Unable to connect to server", "Invalid Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
       // RS: Reset the label text
@@ -344,6 +333,7 @@ namespace Scriptio
         csb.UserID = txtUsername.Text;
         csb.Password = txtPassword.Text;
       }
+
       csb.InitialCatalog = databaseName;
       csb.ApplicationName = "Scriptio";
       return csb.ConnectionString;
@@ -617,12 +607,14 @@ namespace Scriptio
 
     private void AddLines(StringCollection strings)
     {
-      foreach (string s in strings)
+      foreach (string oneString in strings)
       {
-        result.Append(Environment.NewLine + s);
+        result.Append(Environment.NewLine + oneString);
 
-        if (s.StartsWith("SET QUOTED_IDENTIFIER") || s.StartsWith("SET ANSI_NULLS"))
+        if (oneString.StartsWith("SET QUOTED_IDENTIFIER") || oneString.StartsWith("SET ANSI_NULLS"))
+        {
           result.Append(Environment.NewLine + "GO");
+        }
       }
     }
 
@@ -663,7 +655,7 @@ namespace Scriptio
 
     private void RdoNoFiles_CheckedChanged(object sender, EventArgs e)
     {
-      txtSaveLocation.Text = string.Empty;
+      txtSaveLocation.Text = "";
       chkNamingConventions.Enabled = false;
     }
 
@@ -705,14 +697,6 @@ namespace Scriptio
         Encoding encoding;
         encoding = chkGenerateASCII.Checked ? Encoding.ASCII : Encoding.Unicode;
         sw = new StreamWriter(saveFileDialog1.FileName, false, encoding);
-        //if (chkGenerateASCII.Checked)
-        //{
-        //  sw = new StreamWriter(saveFileDialog1.FileName, false, Encoding.ASCII);
-        //}
-        //else
-        //{
-        //  sw = new StreamWriter(saveFileDialog1.FileName, false, Encoding.Unicode);
-        //}
 
         foreach (string str in txtResult.Lines)
         {
@@ -776,7 +760,6 @@ namespace Scriptio
 
     private void SaveWindowValue()
     {
-
       Properties.Settings.Default.WindowHeight = Height;
       Properties.Settings.Default.WindowWidth = Width;
       Properties.Settings.Default.WindowLeft = Left;
