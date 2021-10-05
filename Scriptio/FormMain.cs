@@ -106,7 +106,7 @@ namespace Scriptio
       ddlDatabases.Items.Clear();
       try
       {
-        SqlConnection connection = GetConnection("tempdb");
+        SqlConnection connexion = GetConnection("tempdb");
         Server server = new Server(serverName);
 
         // Check if we're using 2005 or higher
@@ -117,13 +117,13 @@ namespace Scriptio
 
           ddlDatabases.Items.Add("(Select a database)");
 
-          foreach (Database db in server.Databases)
+          foreach (Database database in server.Databases)
           {
             // RS: Update the progress bar
             toolStripProgressBar1.Value++;
-            if (!db.IsSystemObject && db.IsAccessible)
+            if (!database.IsSystemObject && database.IsAccessible)
             {
-              ddlDatabases.Items.Add(db.Name);
+              ddlDatabases.Items.Add(database.Name);
             }
           }
 
@@ -322,24 +322,24 @@ namespace Scriptio
       return sqlConnection;
     }
 
-    private string GetConnectionString(string databaseName)
+    private string GetConnectionString(string databaseName, bool useWindowsAuthentication, string userName, string password)
     {
-      SqlConnectionStringBuilder csb = new SqlConnectionStringBuilder();
-      csb.DataSource = txtServerName.Text;
-      if (chkUseWindowsAuthentication.Checked)
+      SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder();
+      sqlConnectionStringBuilder.DataSource = databaseName;
+      if (useWindowsAuthentication)
       {
-        csb.IntegratedSecurity = true;
+        sqlConnectionStringBuilder.IntegratedSecurity = true;
       }
       else
       {
-        csb.IntegratedSecurity = false;
-        csb.UserID = txtUsername.Text;
-        csb.Password = txtPassword.Text;
+        sqlConnectionStringBuilder.IntegratedSecurity = false;
+        sqlConnectionStringBuilder.UserID = userName;
+        sqlConnectionStringBuilder.Password = password;
       }
 
-      csb.InitialCatalog = databaseName;
-      csb.ApplicationName = "Scriptio";
-      return csb.ConnectionString;
+      sqlConnectionStringBuilder.InitialCatalog = databaseName;
+      sqlConnectionStringBuilder.ApplicationName = "Scriptio";
+      return sqlConnectionStringBuilder.ConnectionString;
     }
 
     private void DdlDatabases_SelectedIndexChanged(object sender, EventArgs e)

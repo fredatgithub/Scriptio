@@ -456,7 +456,7 @@ namespace Scriptio
       // 
       // groupBox5
       // 
-      this.groupBox5.BackColor = System.Drawing.Color.IndianRed;
+      this.groupBox5.BackColor = System.Drawing.Color.PeachPuff;
       this.groupBox5.Controls.Add(this.chkGenerateASCII);
       this.groupBox5.Controls.Add(this.chkSchemaQualifyFK);
       this.groupBox5.Controls.Add(this.chkSchemaQualifyDrops);
@@ -531,7 +531,7 @@ namespace Scriptio
       // 
       // groupBox4
       // 
-      this.groupBox4.BackColor = System.Drawing.Color.Firebrick;
+      this.groupBox4.BackColor = System.Drawing.Color.Beige;
       this.groupBox4.Controls.Add(this.chkNamingConventions);
       this.groupBox4.Controls.Add(this.rdoOnePerObject);
       this.groupBox4.Controls.Add(this.btnPickDirectory);
