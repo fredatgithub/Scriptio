@@ -41,6 +41,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -156,18 +157,18 @@ namespace Scriptio
       // sys.schemas and sys.assemblies tables we step through our SMO database object. This is efficient
       // enough - even on large databases - but it allows us to use the Scripter object to script objects
       // based on the URN returned.
-      Server srv;
+      Server server;
 
       if (chkUseWindowsAuthentication.Checked)
       {
-        srv = new Server(txtServerName.Text);
+        server = new Server(txtServerName.Text);
       }
       else
       {
-        srv = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
+        server = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
       }
 
-      Database db = srv.Databases[ddlDatabases.SelectedItem.ToString()];
+      Database database = server.Databases[ddlDatabases.SelectedItem.ToString()];
 
       // RS: Set the DataTable up so we're all ready to add data to it
       allobjects = null;
@@ -184,7 +185,7 @@ namespace Scriptio
       DataTable allobjectsenum = new DataTable();
       toolStripStatusLabel1.Text = "Enumerating objects in database...";
       Application.DoEvents();
-      allobjectsenum = db.EnumObjects();
+      allobjectsenum = database.EnumObjects();
 
       toolStripProgressBar1.Value = 0;
       toolStripProgressBar1.Maximum = allobjectsenum.Rows.Count;
@@ -232,11 +233,11 @@ namespace Scriptio
       // DataTable. NOTE: We don't need to update the clbSchema list box, as the schema that the table
       // that "owns" the trigger is inferred on the trigger. I think. Does that make sense to anyone besides
       // me?
-      foreach (Table tbl in db.Tables)
+      foreach (Table table in database.Tables)
       {
-        foreach (Trigger trg in tbl.Triggers)
+        foreach (Trigger trg in table.Triggers)
         {
-          allobjects.Rows.Add(new object[] { false, tbl.Schema.ToString(), trg.Name.ToString(), "Trigger", trg.Urn.ToString() });
+          allobjects.Rows.Add(new object[] { false, table.Schema.ToString(), trg.Name.ToString(), "Trigger", trg.Urn.ToString() });
         }
       }
 
@@ -268,13 +269,13 @@ namespace Scriptio
 
       dgAvailableObjects.DataSource = allobjectsview;
 
-      foreach (DataGridViewRow dgr in dgAvailableObjects.Rows)
+      foreach (DataGridViewRow dataGridViewRow in dgAvailableObjects.Rows)
       {
         // RS: Some more chunky clbType populating code...saves us the hassle of having to add it when
         // we're populating, as we don't know whether or not we have triggers until later.
-        if ((!clbType.Items.Contains(dgr.Cells[3].Value.ToString())) && (dgr.Cells[3].Value.ToString() != string.Empty))
+        if ((!clbType.Items.Contains(dataGridViewRow.Cells[3].Value.ToString())) && (dataGridViewRow.Cells[3].Value.ToString() != string.Empty))
         {
-          clbType.Items.Add(dgr.Cells[3].Value.ToString());
+          clbType.Items.Add(dataGridViewRow.Cells[3].Value.ToString());
         }
       }
 
@@ -296,6 +297,8 @@ namespace Scriptio
       dgAvailableObjects.Columns[2].Width = 316;
       dgAvailableObjects.Columns[3].Width = 200;
       toolStripStatusLabel1.Text = "Ready";
+      dgAvailableObjects.RowsDefaultCellStyle.BackColor = Color.Bisque;
+      dgAvailableObjects.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
     }
 
     private SqlConnection GetConnection(string databaseName)
