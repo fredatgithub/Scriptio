@@ -133,7 +133,7 @@ namespace Scriptio
       // 
       // groupBox3
       // 
-      this.groupBox3.BackColor = System.Drawing.Color.IndianRed;
+      this.groupBox3.BackColor = System.Drawing.Color.Beige;
       this.groupBox3.Controls.Add(this.clbType);
       this.groupBox3.Controls.Add(this.clbSchema);
       this.groupBox3.Controls.Add(this.label3);
@@ -233,6 +233,7 @@ namespace Scriptio
       // 
       // groupBox2
       // 
+      this.groupBox2.BackColor = System.Drawing.Color.Bisque;
       this.groupBox2.Controls.Add(this.chkPermissions);
       this.groupBox2.Controls.Add(this.chkIndexes);
       this.groupBox2.Controls.Add(this.chkKeys);
@@ -351,6 +352,7 @@ namespace Scriptio
       // 
       // groupBox1
       // 
+      this.groupBox1.BackColor = System.Drawing.Color.Bisque;
       this.groupBox1.Controls.Add(this.label7);
       this.groupBox1.Controls.Add(this.label6);
       this.groupBox1.Controls.Add(this.txtPassword);
@@ -439,6 +441,7 @@ namespace Scriptio
       this.txtServerName.Name = "txtServerName";
       this.txtServerName.Size = new System.Drawing.Size(169, 20);
       this.txtServerName.TabIndex = 0;
+      this.txtServerName.Text = "localhost";
       // 
       // tabOptions
       // 

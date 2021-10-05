@@ -161,14 +161,14 @@ namespace Scriptio
 
       if (chkUseWindowsAuthentication.Checked)
       {
-        server = new Server(txtServerName.Text);
+        server = new Server(serverName);
       }
       else
       {
-        server = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
+        server = new Server(new ServerConnection(serverName, txtUsername.Text, txtPassword.Text));
       }
 
-      Database database = server.Databases[ddlDatabases.SelectedItem.ToString()];
+      Database database = server.Databases[databaseName];
 
       // RS: Set the DataTable up so we're all ready to add data to it
       allobjects = null;
@@ -365,14 +365,14 @@ namespace Scriptio
       toolStripStatusLabel1.Text = "Preparing script...";
       Application.DoEvents();
 
-      Server srv;
+      Server server;
       if (chkUseWindowsAuthentication.Checked)
       {
-        srv = new Server(txtServerName.Text);
+        server = new Server(txtServerName.Text);
       }
       else
       {
-        srv = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
+        server = new Server(new ServerConnection(txtServerName.Text, txtUsername.Text, txtPassword.Text));
       }
 
       string objectType = string.Empty;
@@ -442,7 +442,7 @@ namespace Scriptio
 
       // RS: Set the Scripter object up based on the connection to the server - the need for a Database
       // object is deprecated.
-      Scripter scriptit = new Scripter(srv);
+      Scripter scriptit = new Scripter(server);
       // RS: Setup a URN object - this doesn't work quite the way I expected it to, but I managed to find a
       // code sample that had the index references. Now I understand it:)
       Urn[] scripturn = new Urn[1];
@@ -691,22 +691,17 @@ namespace Scriptio
 
     private void BtnSaveAs_Click(object sender, EventArgs e)
     {
-      // RS: New code to save the scripted output.
       if (saveFileDialog1.ShowDialog() == DialogResult.OK)
       {
-        // RS: Use a StreamWriter, and push each line of resultant text into it.
-        StreamWriter sw;
-        // RS: Make sure our StreamWriter's encoding is configured based on the user's options
         Encoding encoding;
         encoding = chkGenerateASCII.Checked ? Encoding.ASCII : Encoding.Unicode;
-        sw = new StreamWriter(saveFileDialog1.FileName, false, encoding);
-
-        foreach (string str in txtResult.Lines)
+        using (StreamWriter sw = new StreamWriter(saveFileDialog1.FileName, false, encoding))
         {
-          sw.WriteLine(str);
+          foreach (string str in txtResult.Lines)
+          {
+            sw.WriteLine(str);
+          }
         }
-
-        sw.Close();
       }
     }
 
