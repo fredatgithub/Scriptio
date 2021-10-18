@@ -30,7 +30,7 @@
 //   UserDefinedTypes to the clbType items collection, it should add it as "User Defined Types". Beautify the
 //   description in the DataGrid too so that they match.
 //
-// - Make sure we've exposed ALL relevant ScriptingOptions properties to the user, you never know what oddity might
+// - Make sure we've exposed ALL relevant Scripting Options properties to the user, you never know what oddity might
 //   be required by a single person in a single environment
 
 using Microsoft.SqlServer.Management.Common;
