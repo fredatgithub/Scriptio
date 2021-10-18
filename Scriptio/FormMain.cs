@@ -20,7 +20,7 @@
 
 // Please note: comments marked RS are for code pieces added by Riccardo Spagni
 
-// TODO: (ie. optional extras:)
+// TO DO: (ie. optional extras:)
 //
 // - Build intelligence into the selection system, so that when you select an item in the DataGrid it checks if
 //   all Stored Procs, for example, have been manually ticked in the DataGrid, and then reflects that in the
@@ -51,18 +51,18 @@ namespace Scriptio
 {
   public partial class Scriptio : Form
   {
-    // RS: It's better to use StringBuilder to build our script than string concatenation, as the StringBuilder
+    // It's better to use StringBuilder to build our script than string concatenation, as the StringBuilder
     // object is more efficient. When you concatenate a string, the original string is actually destroyed on
     // the heap and a new one is created.
     private StringBuilder result;
 
-    // RS: This is the main DataTable that contains ALL of the objects on the database, system and user
+    // This is the main DataTable that contains ALL of the objects on the database, system and user
     // supplied
-    private DataTable allobjects = new DataTable();
+    private DataTable allObjects = new DataTable();
 
-    // RS: We use a DataView with a custom RowFilter to ensure that we exclude system supplied objects from
+    // We use a DataView with a custom RowFilter to ensure that we exclude system supplied objects from
     // the DataGrid that the user will use to select the objects they want to script
-    private DataView allobjectsview;
+    private DataView allObjectsView;
 
     public Scriptio()
     {
@@ -99,27 +99,26 @@ namespace Scriptio
 
     private void PopulateDatabases(string serverName)
     {
-      // RS: Tell the user what we're doing when we do it
+      // Tell the user what we're doing when we do it
       toolStripStatusLabel1.Text = "Reading databases...";
       toolStripProgressBar1.Value = 0;
       Application.DoEvents();
       ddlDatabases.Items.Clear();
       try
       {
-        SqlConnection connexion = GetConnection("tempdb");
         Server server = new Server(serverName);
 
         // Check if we're using 2005 or higher
         if (server.Information.Version.Major >= 9)
         {
-          // RS: Set the progress bar maximum so we can update it as we step through
+          // Set the progress bar maximum so we can update it as we step through
           toolStripProgressBar1.Maximum = server.Databases.Count;
 
           ddlDatabases.Items.Add("(Select a database)");
 
           foreach (Database database in server.Databases)
           {
-            // RS: Update the progress bar
+            // Update the progress bar
             toolStripProgressBar1.Value++;
             if (!database.IsSystemObject && database.IsAccessible)
             {
@@ -146,14 +145,14 @@ namespace Scriptio
         MessageBox.Show("Unable to connect to server", "Invalid Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
-      // RS: Reset the label text
+      // Reset the label text
       toolStripStatusLabel1.Text = "Ready";
       toolStripProgressBar1.Value = toolStripProgressBar1.Minimum;
     }
 
     private void PopulateObjects(string serverName, string databaseName)
     {
-      // RS: This has been completely overhauled and replaced. Instead of querying the sys.all_objects,
+      // This has been completely overhauled and replaced. Instead of querying the sys.all_objects,
       // sys.schemas and sys.assemblies tables we step through our SMO database object. This is efficient
       // enough - even on large databases - but it allows us to use the Scripter object to script objects
       // based on the URN returned.
@@ -170,41 +169,41 @@ namespace Scriptio
 
       Database database = server.Databases[databaseName];
 
-      // RS: Set the DataTable up so we're all ready to add data to it
-      allobjects = null;
-      allobjects = new DataTable();
-      allobjects.Columns.Add("Script", typeof(bool));
-      allobjects.Columns.Add("Schema", typeof(string));
-      allobjects.Columns.Add("Object", typeof(string));
-      allobjects.Columns.Add("Type", typeof(string));
-      allobjects.Columns.Add("URN", typeof(string));
+      // Set the DataTable up so we're all ready to add data to it
+      allObjects = null;
+      allObjects = new DataTable();
+      allObjects.Columns.Add("Script", typeof(bool));
+      allObjects.Columns.Add("Schema", typeof(string));
+      allObjects.Columns.Add("Object", typeof(string));
+      allObjects.Columns.Add("Type", typeof(string));
+      allObjects.Columns.Add("URN", typeof(string));
 
-      // RS: Set a temporary DataTable up so we can plug the EnumObjects stuff into it. There is a method
+      // Set a temporary DataTable up so we can plug the EnumObjects stuff into it. There is a method
       // behind this madness - we can use the Count property of the allobjectsenum DataTable to get a total
       // size of the objects in our database.
-      DataTable allobjectsenum = new DataTable();
+      DataTable allObjectsEnum = new DataTable();
       toolStripStatusLabel1.Text = "Enumerating objects in database...";
       Application.DoEvents();
-      allobjectsenum = database.EnumObjects();
+      allObjectsEnum = database.EnumObjects();
 
       toolStripProgressBar1.Value = 0;
-      toolStripProgressBar1.Maximum = allobjectsenum.Rows.Count;
+      toolStripProgressBar1.Maximum = allObjectsEnum.Rows.Count;
       toolStripStatusLabel1.Text = "Reading primary objects...";
       Application.DoEvents();
 
-      // RS: Clear the filter items.
+      // Clear the filter items.
       chkScriptAll.Checked = false;
       clbSchema.Items.Clear();
       clbType.Items.Clear();
 
-      // RS: Step through our enumerated DataTable and add them to a final DataTable. There's probably a
+      // Step through our enumerated DataTable and add them to a final DataTable. There's probably a
       // better way of doing this, but I like the fact that this updated the progress bar as it keeps the
       // user notified that things are happening.
-      foreach (DataRow dataRow in allobjectsenum.Rows)
+      foreach (DataRow dataRow in allObjectsEnum.Rows)
       {
         toolStripProgressBar1.Value++;
-        allobjects.Rows.Add(new object[] { false, dataRow[1].ToString(), dataRow[2].ToString(), dataRow[0].ToString(), dataRow[3].ToString() });
-        // RS: This is a little chunky, I'm open to suggestions in terms of making it more efficient. All
+        allObjects.Rows.Add(new object[] { false, dataRow[1].ToString(), dataRow[2].ToString(), dataRow[0].ToString(), dataRow[3].ToString() });
+        // This is a little chunky, I'm open to suggestions in terms of making it more efficient. All
         // it does is populate the clbSchema listbox with unique schema values that aren't system schemas.
         if ((!clbSchema.Items.Contains(dataRow[1].ToString())) && (dataRow[1].ToString() != string.Empty && dataRow[1].ToString() != "sys" && dataRow[1].ToString() != "INFORMATION_SCHEMA"))
         {
@@ -214,7 +213,7 @@ namespace Scriptio
         Application.DoEvents();
       }
 
-      // RS: Disable the schema list if it's empty
+      // Disable the schema list if it's empty
       if (clbSchema.Items.Count > 0)
       {
         clbSchema.Enabled = true;
@@ -224,54 +223,49 @@ namespace Scriptio
         clbSchema.Enabled = false;
       }
 
-      // RS: Update the user
+      // Update the user
       toolStripProgressBar1.Value = 0;
       toolStripStatusLabel1.Text = "Reading secondary objects...";
       Application.DoEvents();
 
-      // RS: This is icky, but the only way. Step through triggers on a per table basis and add it to the
+      // This is icky, but the only way. Step through triggers on a per table basis and add it to the
       // DataTable. NOTE: We don't need to update the clbSchema list box, as the schema that the table
       // that "owns" the trigger is inferred on the trigger. I think. Does that make sense to anyone besides
       // me?
       foreach (Table table in database.Tables)
       {
-        foreach (Trigger trg in table.Triggers)
+        foreach (Trigger trigger in table.Triggers)
         {
-          allobjects.Rows.Add(new object[] { false, table.Schema.ToString(), trg.Name.ToString(), "Trigger", trg.Urn.ToString() });
+          allObjects.Rows.Add(new object[] { false, table.Schema.ToString(), trigger.Name.ToString(), "Trigger", trigger.Urn.ToString() });
         }
       }
 
-      // RS: Set the DataView up based on the allobjects DataTable
-      allobjectsview = new DataView(allobjects);
+      // Set the DataView up based on the allobjects DataTable
+      allObjectsView = new DataView(allObjects);
 
-      // RS: Large databases can take a few seconds to create the DataView, tell the user what we're doing
+      // Large databases can take a few seconds to create the DataView, tell the user what we're doing
       toolStripStatusLabel1.Text = "Filtering and sorting...";
       Application.DoEvents();
 
-      // RS: Filter our system objects
-      allobjectsview.RowFilter = "([Schema] <> 'INFORMATION_SCHEMA') AND ([Schema] <> 'sys') AND" +
+      // Filter our system objects
+      allObjectsView.RowFilter = "([Schema] <> 'INFORMATION_SCHEMA') AND ([Schema] <> 'sys') AND" +
                                   "([Type] IN ('ExtendedStoredProcedure', 'PartitionFunction', 'PartitionScheme', " +
                                   "'SqlAssembly', 'StoredProcedure', 'Table', 'Trigger', 'UserDefinedAggregate', " +
                                   "'UserDefinedDataType', 'UserDefinedFunction', 'UserDefinedType', 'View'))";
-      // RS: Sort by the type of object we're dealing with
-      allobjectsview.Sort = "[Type]";
+      // Sort by the type of object we're dealing with
+      allObjectsView.Sort = "[Type]";
 
-      // RS: This is an optional RowFilter that has Users and Schema's in it - but you end up with stuff
+      // This is an optional RowFilter that has Users and Schema's in it - but you end up with stuff
       // that is Microsoft supplied, and it's really not worth our while adding an entire section that
       // iterates through objects and checks their IsSystemSupplied property - because then we'd also need
       // to ensure that IsSystemSupplied is part of the default properties that SMO fetches - an altogether
       // unnecessary exercise, and one that would noticeably slow SMO down.
 
-      /* allobjects.RowFilter =  "([Schema] <> 'INFORMATION_SCHEMA') AND ([Schema] <> 'sys') AND" +
-                              "([Type] IN ('ExtendedStoredProcedure', 'PartitionFunction', 'PartitionScheme', 'Trigger', " +
-                              "'Schema', 'SqlAssembly', 'StoredProcedure', 'Table', 'User', 'UserDefinedAggregate', " +
-                              "'UserDefinedDataType', 'UserDefinedFunction', 'UserDefinedType', 'View'))";*/
-
-      dgAvailableObjects.DataSource = allobjectsview;
+      dgAvailableObjects.DataSource = allObjectsView;
 
       foreach (DataGridViewRow dataGridViewRow in dgAvailableObjects.Rows)
       {
-        // RS: Some more chunky clbType populating code...saves us the hassle of having to add it when
+        // Some more chunky clbType populating code...saves us the hassle of having to add it when
         // we're populating, as we don't know whether or not we have triggers until later.
         if ((!clbType.Items.Contains(dataGridViewRow.Cells[3].Value.ToString())) && (dataGridViewRow.Cells[3].Value.ToString() != string.Empty))
         {
@@ -279,7 +273,7 @@ namespace Scriptio
         }
       }
 
-      // RS: Disable the Type list if it's empty
+      // Disable the Type list if it's empty
       if (clbType.Items.Count > 0)
       {
         clbType.Enabled = true;
@@ -289,9 +283,9 @@ namespace Scriptio
         clbType.Enabled = false;
       }
 
-      // RS: Hide the URN from the DataGrid
+      // Hide the URN from the DataGrid
       dgAvailableObjects.Columns[4].Visible = false;
-      // RS: Set column widths on the DataGrid
+      // Set column widths on the DataGrid
       dgAvailableObjects.Columns[0].Width = 50;
       dgAvailableObjects.Columns[1].Width = 130;
       dgAvailableObjects.Columns[2].Width = 316;
@@ -358,7 +352,7 @@ namespace Scriptio
 
     private void BtnScript_Click(object sender, EventArgs e)
     {
-      // RS: This section has also been heavily modified and rewritten to use the Scripter object instead of
+      // This section has also been heavily modified and rewritten to use the Scripter object instead of
       // iterating through predefined objects and using their script method. This gives us the added
       // flexibility of being able to populate the allobjects DataTable with ANY object that has a valid
       // URN, and the code will script it.
@@ -382,20 +376,20 @@ namespace Scriptio
 
       result = new StringBuilder();
 
-      // RS: Instead of stepping through the dataset to see what's checked, we just use a DataView to limit
+      // Instead of stepping through the dataset to see what's checked, we just use a DataView to limit
       // the rows to only those that have the Script column equal to true.
-      DataView allobjectschecked = new DataView(allobjects);
-      // RS: Filter our system objects
-      allobjectschecked.RowFilter = "([Schema] <> 'INFORMATION_SCHEMA') AND ([Schema] <> 'sys') AND" +
+      DataView allObjectsChecked = new DataView(allObjects);
+      // Filter our system objects
+      allObjectsChecked.RowFilter = "([Schema] <> 'INFORMATION_SCHEMA') AND ([Schema] <> 'sys') AND" +
                                     "([Type] IN ('ExtendedStoredProcedure', 'PartitionFunction', 'PartitionScheme', " +
                                     "'SqlAssembly', 'StoredProcedure', 'Table', 'Trigger', 'UserDefinedAggregate', " +
                                     "'UserDefinedDataType', 'UserDefinedFunction', 'UserDefinedType', 'View')) " +
                                     "AND [Script] = True";
 
       dgAvailableObjects.EndEdit();
-      // RS: We use the DataView's count property rather than the deprecated function from the previous
+      // We use the DataView's count property rather than the deprecated function from the previous
       // version of Scriptio.
-      int totalObjects = allobjectschecked.Count;
+      int totalObjects = allObjectsChecked.Count;
       toolStripProgressBar1.Value = 0;
       toolStripProgressBar1.Maximum = totalObjects;
       result.EnsureCapacity(totalObjects * 4000);
@@ -426,7 +420,7 @@ namespace Scriptio
       dropOptions.IncludeIfNotExists = chkExistance.Checked;
       dropOptions.SchemaQualify = chkSchemaQualifyDrops.Checked;
 
-      // RS: Set the encoding options for both the drop AND the base scripting options object. We have to
+      // Set the encoding options for both the drop AND the base scripting options object. We have to
       // do it on both, otherwise we have two different encodings in the same file, and we end up with a
       // complete mess.
       if (chkGenerateASCII.Checked)
@@ -440,12 +434,12 @@ namespace Scriptio
         baseOptions.Encoding = Encoding.Unicode;
       }
 
-      // RS: Set the Scripter object up based on the connection to the server - the need for a Database
+      // Set the Scripter object up based on the connection to the server - the need for a Database
       // object is deprecated.
       Scripter scriptit = new Scripter(server);
-      // RS: Setup a URN object - this doesn't work quite the way I expected it to, but I managed to find a
+      // Setup a URN object - this doesn't work quite the way I expected it to, but I managed to find a
       // code sample that had the index references. Now I understand it:)
-      Urn[] scripturn = new Urn[1];
+      Urn[] scriptUrn = new Urn[1];
 
       if (rdoOneFile.Checked || rdoOnePerObject.Checked)
       {
@@ -454,7 +448,7 @@ namespace Scriptio
       }
 
       // process each checked object
-      foreach (DataRowView row in allobjectschecked)
+      foreach (DataRowView row in allObjectsChecked)
       {
         toolStripProgressBar1.Value++;
 
@@ -465,7 +459,7 @@ namespace Scriptio
 
         if (rdoOnePerObject.Checked)
         {
-          // RS: Set the filename up based on whether we're using the static .sql extension, or the
+          // Set the filename up based on whether we're using the static .sql extension, or the
           // more dynamic SQL 2000 file extensions
           if (chkNamingConventions.Checked)
           {
@@ -565,7 +559,7 @@ namespace Scriptio
           dropOptions.FileName = fileName;
         }
 
-        // RS: Tell the user what object we're scripting so they know when they hit a large object.
+        // Tell the user what object we're scripting so they know when they hit a large object.
         if (schema.Length > 0)
         {
           toolStripStatusLabel1.Text = $"Scripting: {schema}.{objectName}...";
@@ -575,26 +569,25 @@ namespace Scriptio
           toolStripStatusLabel1.Text = $"Scripting: {objectName}...";
         }
 
-        // RS: Run DoEvents() *before* we start the scripting, so the user sees the update above.
+        // Run DoEvents() *before* we start the scripting, so the user sees the update above.
         Application.DoEvents();
 
-        // RS: Set the URN object equal to the URN string.
-        scripturn[0] = row[4].ToString();
+        // Set the URN object equal to the URN string.
+        scriptUrn[0] = row[4].ToString();
 
         if (chkDrop.Checked)
         {
-          // RS: Set the Scripter options, as we don't pass it when we call the Script method.
+          // Set the Scripter options as we don't pass it when we call the Script method.
           scriptit.Options = dropOptions;
-          // RS: Call the Script method, and pass the URN.
-          AddLines(scriptit.Script(scripturn));
+          // Call the Script method, and pass the URN.
+          AddLines(scriptit.Script(scriptUrn));
           AddGo();
         }
 
         if (chkCreate.Checked)
         {
-          // RS: As per above
           scriptit.Options = baseOptions;
-          AddLines(scriptit.Script(scripturn));
+          AddLines(scriptit.Script(scriptUrn));
           AddGo();
         }
       }
@@ -603,7 +596,7 @@ namespace Scriptio
       txtResult.Text = result.ToString();
       toolStripStatusLabel1.Text = "Ready";
       tabControl1.SelectedTab = tabResult;
-      allobjectschecked.RowFilter = string.Empty;
+      allObjectsChecked.RowFilter = string.Empty;
       toolStripProgressBar1.Value = toolStripProgressBar1.Minimum;
       txtResult.DeselectAll();
     }
@@ -676,8 +669,8 @@ namespace Scriptio
 
     private void ChkUseWindowsAuthentication_CheckedChanged(object sender, EventArgs e)
     {
-      CheckBox c = (CheckBox)sender;
-      if (c.Checked)
+      CheckBox checkbox = (CheckBox)sender;
+      if (checkbox.Checked)
       {
         txtUsername.Enabled = false;
         txtPassword.Enabled = false;
@@ -695,11 +688,11 @@ namespace Scriptio
       {
         Encoding encoding;
         encoding = chkGenerateASCII.Checked ? Encoding.ASCII : Encoding.Unicode;
-        using (StreamWriter sw = new StreamWriter(saveFileDialog1.FileName, false, encoding))
+        using (StreamWriter streamWriter = new StreamWriter(saveFileDialog1.FileName, false, encoding))
         {
-          foreach (string str in txtResult.Lines)
+          foreach (string oneString in txtResult.Lines)
           {
-            sw.WriteLine(str);
+            streamWriter.WriteLine(oneString);
           }
         }
       }
@@ -707,7 +700,7 @@ namespace Scriptio
 
     private void ScriptioLoad(object sender, EventArgs e)
     {
-      // RS: If we're building a debug build, set the server name to localhost and populate the database
+      // If we're building a debug build, set the server name to localhost and populate the database
       // list - saves us the hassle if we're testing. Change this as necessary.
 #if (DEBUG)
       txtServerName.Text = @"localhost";
@@ -726,9 +719,9 @@ namespace Scriptio
 
     private void ClbType_SelectedIndexChanged(object sender, EventArgs e)
     {
-      foreach (DataRow dataRow in allobjects.Rows)
+      foreach (DataRow dataRow in allObjects.Rows)
       {
-        // RS: Run throught the DataGrid and check anything that's been checked in the Type list
+        // Run throught the DataGrid and check anything that's been checked in the Type list
         if (clbType.CheckedItems.Contains(dataRow[3].ToString()))
         {
           dataRow[0] = true;
@@ -742,17 +735,10 @@ namespace Scriptio
 
     private void ClbSchema_SelectedIndexChanged(object sender, EventArgs e)
     {
-      foreach (DataRow dataRow in allobjects.Rows)
+      foreach (DataRow dataRow in allObjects.Rows)
       {
-        // RS: Run throught the DataGrid and check anything that's been checked in the Type list
-        if (clbSchema.CheckedItems.Contains(dataRow[1].ToString()))
-        {
-          dataRow[0] = true;
-        }
-        else
-        {
-          dataRow[0] = false;
-        }
+        // Run throught the DataGrid and check anything that's been checked in the Type list
+        dataRow[0] = clbSchema.CheckedItems.Contains(dataRow[1].ToString());
       }
     }
 
