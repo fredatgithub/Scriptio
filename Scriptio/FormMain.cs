@@ -170,7 +170,6 @@ namespace Scriptio
       Database database = server.Databases[databaseName];
 
       // Set the DataTable up so we're all ready to add data to it
-      allObjects = null;
       allObjects = new DataTable();
       allObjects.Columns.Add("Script", typeof(bool));
       allObjects.Columns.Add("Schema", typeof(string));
@@ -203,8 +202,7 @@ namespace Scriptio
       {
         toolStripProgressBar1.Value++;
         allObjects.Rows.Add(new object[] { false, dataRow[1].ToString(), dataRow[2].ToString(), dataRow[0].ToString(), dataRow[3].ToString() });
-        // This is a little chunky, I'm open to suggestions in terms of making it more efficient. All
-        // it does is populate the clbSchema listbox with unique schema values that aren't system schemas.
+        // All it does is populate the clbSchema listbox with unique schema values that aren't system schemas.
         if ((!clbSchema.Items.Contains(dataRow[1].ToString())) && (dataRow[1].ToString() != string.Empty && dataRow[1].ToString() != "sys" && dataRow[1].ToString() != "INFORMATION_SCHEMA"))
         {
           clbSchema.Items.Add(dataRow[1].ToString());
